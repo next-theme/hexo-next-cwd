@@ -1,0 +1,14 @@
+# For more information: https://cwd.js.org/guide/frontend-config.html
+cwd:
+  enable: false
+  api_base_url: # Your deployed CWD API endpoint
+  site_id: # Recommended for multi-site data isolation
+  lang: auto
+  # Available values: auto | light | dark
+  theme: auto
+  page_size: 20
+  custom_css_url:
+  # Pin the version or point this to a custom CWD build.
+  js: https://unpkg.com/cwd-widget@0.1.13/dist/cwd.js
+  # The default thread identifier is CONFIG.page.path (normally without a leading slash).
+  # Set `cwd_post_slug` in page front-matter to override it.
