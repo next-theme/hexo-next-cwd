@@ -1,0 +1,71 @@
+{{ next_data('cwd', config.cwd, {
+  post_slug: page.cwd_post_slug
+}) }}
+
+<script>
+(() => {
+  let cwdComments;
+  let colorScheme;
+  let loadId = 0;
+
+  const resolveTheme = () => {
+    if (CONFIG.cwd.theme === 'dark') return 'dark';
+    if (CONFIG.cwd.theme === 'light') return 'light';
+    return CONFIG.darkmode && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+
+  const updateTheme = () => {
+    if (cwdComments) cwdComments.updateConfig({ theme: resolveTheme() });
+  };
+
+  const unmountComments = () => {
+    loadId++;
+    if (colorScheme) {
+      colorScheme.removeEventListener('change', updateTheme);
+      colorScheme = null;
+    }
+    if (cwdComments) {
+      cwdComments.unmount();
+      cwdComments = null;
+    }
+  };
+
+  document.addEventListener('page:loaded', async () => {
+    if (!CONFIG.page.comments) return;
+
+    unmountComments();
+    const currentLoadId = loadId;
+    const container = document.querySelector('.cwd-container');
+    await NexT.utils.loadComments('.cwd-container');
+    if (currentLoadId !== loadId || !container?.isConnected) return;
+
+    await NexT.utils.getScript(CONFIG.cwd.js, {
+      condition: window.CWDComments
+    });
+    if (currentLoadId !== loadId || !container.isConnected) return;
+
+    const options = {
+      el        : container,
+      apiBaseUrl: CONFIG.cwd.api_base_url,
+      siteId    : CONFIG.cwd.site_id,
+      postSlug  : CONFIG.cwd.post_slug || CONFIG.page.path,
+      lang      : CONFIG.cwd.lang || 'auto',
+      theme     : resolveTheme(),
+      pageSize  : CONFIG.cwd.page_size || 20
+    };
+    if (CONFIG.cwd.custom_css_url) {
+      options.customCssUrl = CONFIG.cwd.custom_css_url;
+    }
+
+    cwdComments = new window.CWDComments(options);
+    cwdComments.mount();
+
+    if (CONFIG.cwd.theme === 'auto' && CONFIG.darkmode) {
+      colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
+      colorScheme.addEventListener('change', updateTheme);
+    }
+  });
+
+  document.addEventListener('pjax:send', unmountComments);
+})();
+</script>
