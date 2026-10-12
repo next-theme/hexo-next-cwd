@@ -22,7 +22,7 @@ cwd:
   theme: auto
   page_size: 20
   custom_css_url:
-  js: https://unpkg.com/cwd-widget@0.1.13/dist/cwd.js
+  js: https://cdn.jsdelivr.net/npm/cwd-widget@0.2.1/dist/cwd.js
 ```
 
 By default, the comment thread identifier is `CONFIG.page.path`, which normally
