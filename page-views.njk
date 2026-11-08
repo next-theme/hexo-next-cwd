@@ -1,0 +1,43 @@
+<script>
+(() => {
+  let controller;
+
+  document.addEventListener('page:loaded', () => {
+    controller?.abort();
+    const counters = document.querySelectorAll('.cwd-visitors-count[data-cwd-post-url]');
+    if (!counters.length) return;
+
+    controller = new AbortController();
+    const { signal } = controller;
+    const requests = new Map();
+
+    const fetchViews = async postUrl => {
+      const endpoint = new URL(`${CONFIG.cwd.api_base_url.replace(/\/+$/, '')}/api/analytics/pv`);
+      endpoint.searchParams.set('post_slug', postUrl);
+      if (CONFIG.cwd.site_id) endpoint.searchParams.set('siteId', CONFIG.cwd.site_id);
+
+      const response = await fetch(endpoint, { signal });
+      if (!response.ok) throw new Error('Unable to load CWD page views.');
+      const { pv } = await response.json();
+      if (!Number.isSafeInteger(pv) || pv < 0) throw new Error('Invalid CWD page view count.');
+      return pv;
+    };
+
+    counters.forEach(counter => {
+      const postUrl = counter.dataset.cwdPostUrl;
+      if (!postUrl) return;
+      if (!requests.has(postUrl)) requests.set(postUrl, fetchViews(postUrl));
+
+      requests.get(postUrl).then(pv => {
+        if (signal.aborted || !counter.isConnected) return;
+        counter.textContent = String(pv);
+        counter.dataset.cwdPv = String(pv);
+      }).catch(() => {
+        // Keep the placeholder when a request fails or a PJAX navigation cancels it.
+      });
+    });
+  });
+
+  document.addEventListener('pjax:send', () => controller?.abort());
+})();
+</script>

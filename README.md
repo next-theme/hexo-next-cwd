@@ -21,6 +21,7 @@ cwd:
   # Available values: auto | light | dark
   theme: auto
   page_size: 20
+  page_views: false
   custom_css_url:
   js: https://cdn.jsdelivr.net/npm/cwd-widget@0.2.1/dist/cwd.js
 ```
@@ -28,6 +29,21 @@ cwd:
 By default, the comment thread identifier is `CONFIG.page.path`, which normally
 does not start with `/`. Set `cwd_post_slug` in a page's front matter to override
 it.
+
+## Page Views
+
+Set `cwd.page_views` to `true` to display CWD page views in NexT's post metadata.
+The plugin uses the `postMeta` theme injection point, without modifying NexT's
+templates. Counts are loaded on post pages and post lists, including PJAX
+navigation, independently of lazy-loaded comments.
+
+Counts use each post's canonical permalink and the configured `site_id`. The
+plugin only reads `GET /api/analytics/pv`; the CWD widget continues to record
+visits, so displaying counts does not add duplicate visits. A failed request
+leaves a dash in place of the count.
+
+Disable other page-view integrations, such as `firestore.enable`, to avoid
+displaying two counters. Existing counts from other providers are not migrated.
 
 ## Custom Widget Builds
 

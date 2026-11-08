@@ -7,6 +7,8 @@ cwd:
   # Available values: auto | light | dark
   theme: auto
   page_size: 20
+  # Display CWD page views in NexT post metadata, including post lists.
+  page_views: false
   custom_css_url:
   # Pin the version or point this to a custom CWD build.
   js: https://cdn.jsdelivr.net/npm/cwd-widget@0.2.1/dist/cwd.js
